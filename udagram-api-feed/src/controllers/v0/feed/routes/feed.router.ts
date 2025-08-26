@@ -27,17 +27,33 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   });
 }
 
-// Get all feed items
+// Get all feed items with logging and error handling
 router.get('/', async (req: Request, res: Response) => {
-  const items = await FeedItem.findAndCountAll({order: [['id', 'DESC']]});
-  // Map items to include signed URLs
-  const itemsWithUrls = await Promise.all(items.rows.map(async (item) => {
-    if (item.url) {
-      item.url = await AWS.getGetSignedUrl(item.url);
-    }
-    return item;
-  }));
-  res.send({count: items.count, rows: itemsWithUrls});
+  console.log(`[${new Date().toISOString()}] GET /feed requested`);
+
+  try {
+    console.log(`[${new Date().toISOString()}] Fetching feed items from DB...`);
+    const items = await FeedItem.findAndCountAll({ order: [['id', 'DESC']] });
+
+    console.log(`[${new Date().toISOString()}] Mapping signed URLs for ${items.count} items...`);
+    const itemsWithUrls = await Promise.all(items.rows.map(async (item) => {
+      try {
+        if (item.url) {
+          item.url = await AWS.getGetSignedUrl(item.url);
+        }
+      } catch (err) {
+        console.error(`[${new Date().toISOString()}] Error signing URL for item ${item.id}:`, err);
+      }
+      return item;
+    }));
+
+    console.log(`[${new Date().toISOString()}] Sending response with ${itemsWithUrls.length} items`);
+    res.status(200).send({ count: items.count, rows: itemsWithUrls });
+
+  } catch (err) {
+    console.error(`[${new Date().toISOString()}] Error in GET /feed:`, err);
+    res.status(500).send({ error: 'Failed to fetch feed items' });
+  }
 });
 
 // Get a feed resource
