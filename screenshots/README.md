@@ -1,25 +1,16 @@
+# Travis CI
+
+* I created a .travis.yml file in the project, but I ended up not using Travis CI. They are requiring a paid plan to use it.
+
+* I used Circle CI instead. In the project root, please see: .circleci/config.yml
+
 # Screenshots
-To help review your infrastructure, please include the following screenshots in this directory::
 
-## Deployment Pipeline
-* DockerHub showing containers that you have pushed
-* GitHub repository’s settings showing your Travis webhook (can be found in Settings - Webhook)
-* Travis CI showing a successful build and deploy job
-
-## Kubernetes
-* To verify Kubernetes pods are deployed properly
-```bash
-kubectl get pods
-```
-* To verify Kubernetes services are properly set up
-```bash
-kubectl describe services
-```
-* To verify that you have horizontal scaling set against CPU usage
-```bash
-kubectl describe hpa
-```
-* To verify that you have set up logging with a backend application
-```bash
-kubectl logs {pod_name}
-```
+* circleci-pipeline-success.jpg
+* dockerhub-api-user.jpg
+* dockerhub-api-feed.jpg
+* dockerhub-reverseproxy.jpg
+* dockerhub-frontend.jpg
+* pods-services.jpg
+* replicas.jpg
+* pod-logs.jpg
